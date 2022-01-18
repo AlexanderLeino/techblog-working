@@ -5,7 +5,7 @@ const exphbs = require('express-handlebars')
 const controllers = require('./controllers')
 
 
-const PORT = 3001
+const PORT = 3001 || process.env.PORT
 const app = express()
 
 app.engine('handlebars', exphbs())
