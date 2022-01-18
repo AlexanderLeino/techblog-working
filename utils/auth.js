@@ -1,10 +1,12 @@
-// middleware to verify user loggied in
 const withAuth = (req, res, next) => {
-    if (!req.session.userId) {
-      res.redirect("/dashboard");
-    } else {
-      next();
-    }
-  };
 
-  module.exports = withAuth;
+  // If the user is not logged in, redirect the request to the login route
+  if (!req.session.loggedIn) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+
+};
+
+module.exports = withAuth;

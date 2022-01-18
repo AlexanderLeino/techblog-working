@@ -5,17 +5,37 @@ const router = require('express').Router()
 
 // html routes
 router.get('/', async (req, res) =>{
+  
     try{  
-      const allBlogs = await blogPost.findAll()
+      const allBlogs = await blogPost.findAll({
+        attributes: ['body', 'title', 'post_creator', 'dateCreated'],
+        include: [{
+          model: User, 
+          attributes: ['userName']
+        }]
+      })
       const serializedBlogs = allBlogs.map( post => {
+        
         return post.get({ plain: true })
       })
-  
-  
-      res.render('home', {
-        secondarytitle: 'Home',
-        posts: serializedBlogs 
-      })
+      if(req.session.loggedIn){
+    const loggedInUser = await User.findByPk(req.session.user_id)
+    loggedInUser.get({plain:true})
+        res.render('home', {
+         secondarytitle: 'The Tech Blog',
+         posts: serializedBlogs,
+         loggedInUser: loggedInUser.userName,
+         
+       })
+
+      } else {
+        res.render('home', {
+          secondarytitle: 'The Tech Blog',
+          posts: serializedBlogs,
+        })
+      }
+        
+       
   } catch(e) {
       res.json(e).status(404)
   }})
@@ -23,22 +43,68 @@ router.get('/', async (req, res) =>{
 
 //This route gets the dashboard page
 router.get('/dashboard', async (req, res) => {
+  
+  if(req.session.loggedIn){
+    const loggedInUser = await User.findByPk(req.session.user_id)
+    loggedInUser.get({plain:true})
+    const loggedInUserPosts = await blogPost.findAll({
+    where: {
+      post_creator: req.session.user_id
+    }
+  })
+  const userBlogs =  await loggedInUserPosts.map( post => {
+    return post.get({plain:true})
+  })
     try {
         res.render('dashboard', {
-            secondarytitle: 'Tech Blog',
+            secondarytitle: 'Your Dashboard',
+            loggedInUser: loggedInUser.userName,
+            post: userBlogs
+            
+            
+            
             
         })
        
     }catch(e){
       res.json(e)
     }
-})
+
+  } else {
+    try {
+      res.render('dashboard', {
+          secondarytitle: 'Your Dashboard',
+          loggedInUser: 'Not Currently Signed In',
+          loggedIn: true
+   
+          
+      })
+  } catch (e){
+    console.log(e)
+  }}})
 
 
 router.get('/login', (req, res) => res.render('login', {
   secondarytitle: 'The Tech Blog',
   signingIn: false,
 }))
+
+router.get('/signUpPage', (req, res) => {
+  res.render('signUpPage', {
+    secondarytitle: 'The Tech Blog',
+
+  })
+})
+
+router.get('/createNewPost', (req, res) => {
+  if(req.session.loggedIn){
+    res.render('createNewPost', {
+      secondarytitle: 'The Tech Blog'
+    })
+  } else {
+    res.redirect('/login')
+  }
+})
 //When the user is logged in then the login button dissappears from the dashboard view
 
 //TODO: when on the dashboard page if the user clicks on the NEW POST button then the user is redirected to /dashboard/new
@@ -64,6 +130,22 @@ router.get('/login', (req, res) => res.render('login', {
     secondarytitle: 'The Tech Blog',
     signingIn: true}
 ))
+
+
+router.get(`/edit/:id`, async (req, res) => {
+      const selectedPost = await blogPost.findByPk(req.params.id, {
+        attributes: ['title', 'body']
+      })
+      
+      console.log(selectedPost)
+      res.render('editPost', {
+      secondarytitle: 'The Tech Blog',
+      title: selectedPost.title,
+      body: selectedPost.body
+    })
+})
+
+
 //TODO: Once the user logins in they need to be redirected to the dashboard
 
 //TODO: On the login page if the user clicks on the Sign Up Instead then we redirect them to the Sign Up box and give them the option to log in instead in place of where the sign up instead click link is. 
@@ -100,5 +182,8 @@ router.get('/login', (req, res) => res.render('login', {
 //   blogPosts.push(body)
 //   res.status(200).send('Post added succesfully!')
 // })
+
+
+
 
 module.exports = router

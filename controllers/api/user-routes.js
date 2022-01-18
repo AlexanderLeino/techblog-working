@@ -1,24 +1,52 @@
 const router = require('express').Router();
 const { User } = require('../../models');
+const withAuth = require('../../utils/auth');
+
+
+//Getting one user for weather app display
+router.get('/', withAuth, async (req, res) => {
+  console.log('Get one user profile hit')
+  try {
+    // Find the logged in user based on the session ID
+    const userData = await User.findByPk(req.session.dbUserData.id, {
+      attributes: { exclude: ['password'] },
+    });
+    
+    const user = userData.get({ plain: true });
+ 
+
+    // res.render('profile', {
+    //   ...user,
+    //   logged_in: true
+    // });
+    
+    res.json(user)
+  } catch (err) {
+    res.status(500).json(err);
+  }
+  
+});
 
 // CREATE new user
 router.post('/', async (req, res) => {
-  try {
-    const dbUserData = await User.create({
-      userName: req.body.userName,
-      password: req.body.password,
-    });
-console.log(dbUserData)
-    req.session.save(() => {
-      req.session.loggedIn = true;
+    try {
+      const dbUserData = await User.create({
+        userName: req.body.userName,
+        password: req.body.password,
+        
+      });
+  
+      req.session.save(() => {
+        req.session.loggedIn = true;
+        req.session.user_id = dbUserData.id;
+  
+        res.status(200).json(dbUserData);
+      })
+    } catch (err) {
+      console.log(err);
+      res.status(500).json(err);
 
-      res.status(200).json(dbUserData);
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
-});
+}});
 
 // Login
 router.post('/login', async (req, res) => {
@@ -35,7 +63,7 @@ router.post('/login', async (req, res) => {
         .json({ message: 'Incorrect username. Please try again!' });
       return;
     }
-console.log(req.body.password)
+
     const validPassword = await dbUserData.checkPassword(req.body.password);
 
     if (!validPassword) {
@@ -47,6 +75,8 @@ console.log(req.body.password)
 
     req.session.save(() => {
       req.session.loggedIn = true;
+      //dbUserData is person that just signed in
+      req.session.user_id = dbUserData.id
 
       res
         .status(200)
@@ -60,6 +90,7 @@ console.log(req.body.password)
 
 // Logout
 router.post('/logout', (req, res) => {
+  
   if (req.session.loggedIn) {
     req.session.destroy(() => {
       res.status(204).end();
@@ -69,6 +100,20 @@ router.post('/logout', (req, res) => {
   }
 });
 
-//Get User Profile save for last
+//Get User Profile
+//api/users/profile
+router.get('/profile', withAuth, async (req, res) => {
+  console.log('Profile Route Hit')
+  try {
+    // Find the logged in user based on the session ID
+    const userData = await User.findByPk(req.session.user_id, {
+      attributes: { exclude: ['password'] },
+    });
+  
+   res.status(200).send(userData)
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 module.exports = router;

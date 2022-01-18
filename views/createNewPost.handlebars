@@ -1,0 +1,28 @@
+<style>
+    .form-label{
+        color: black;
+        font-weight: bolder;
+        font-size: larger;
+    }
+    .container{ 
+        width: 50rem;
+    }
+    .createPostBtn {
+    background-color: #321414;
+    }
+</style>
+
+<div class='container mt-3'>
+<form>
+  <div class="mb-3">
+    <label  class="form-label"> Blog Title</label>
+    <input type="text" class="form-control" id="blogTitle">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Blog Body</label>
+    <input type="text" class="form-control" id="blogBody">
+  </div>
+  <button type="submit" class="btn createPostBtn btn-primary">Submit</button>
+</form>
+</div>
+<script src='/js/add-blogPost.js'></script>

@@ -23,7 +23,7 @@ User.init(
       validate: {
         notNull: {
           msg: 'Please enter a valid UserName'
-        },
+        }
       },
     },
       password: {
@@ -34,6 +34,7 @@ User.init(
         },
       },
     },
+  
   {
     hooks: {
       beforeBulkCreate: async (newUsers) => {
@@ -44,15 +45,16 @@ User.init(
         }
         return users
     },
-      beforeCreate: async (newUserData) => {
-          newUserData.password = await bcrypt.hash(newUserData.password, 5);
-          return newUserData;
-      },
+    beforeCreate: async (newUserData) => {
+        newUserData.password = await bcrypt.hash(newUserData.password, 5);
+        console.log(newUserData)
+        return newUserData;
+    },
     },
     sequelize,
     timestamps: false,
     freezeTableName: true,
-    underscored: true,
+    underscored: false,
     modelName: 'user',
   }
 )
