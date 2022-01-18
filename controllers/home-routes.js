@@ -12,7 +12,7 @@ router.get('/', async (req, res) =>{
       })
   
   
-      res.render('Home', {
+      res.render('home', {
         secondarytitle: 'Home',
         posts: serializedBlogs 
       })
