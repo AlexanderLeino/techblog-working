@@ -1,0 +1,28 @@
+<style>
+    
+    .blogPostContainer{
+        
+        background-color: #2f1515;
+        border: solid .25rem #2f1515;
+        height: 2rem;
+
+
+    }
+    .title{
+        font-weight: bolder;
+
+    }
+    .blogPostBody{
+        border: solid .25rem #2f1515 ;
+        color: black;
+    }
+</style>
+
+<div class="d-flex blogPostContainer mt-3 justify-content-between">
+        <div class="title">{{title}}</div>
+        <div>Posted by {{Username}} on {{dateCreated}}</div>
+        </div>
+        <div class="blogPostBody">
+        {{body}}
+        </div>
+</div>
