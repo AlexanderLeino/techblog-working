@@ -10,4 +10,6 @@ const logout = async () => {
 };
 
 let logOutBtn = document.getElementById("logout");
-logOutBtn.addEventListener("click", logout);
+if(logOutBtn){
+  logOutBtn.addEventListener("click", logout);
+} 
