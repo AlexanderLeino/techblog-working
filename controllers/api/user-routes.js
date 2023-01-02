@@ -1,55 +1,46 @@
-const router = require('express').Router();
-const { User } = require('../../models');
-const withAuth = require('../../utils/auth');
-
+const router = require("express").Router();
+const { User } = require("../../models");
+const withAuth = require("../../utils/auth");
 
 //Getting one user for weather app display
-router.get('/', withAuth, async (req, res) => {
-  console.log('Get one user profile hit')
+router.get("/", withAuth, async (req, res) => {
+  console.log("Get one user profile hit");
   try {
     // Find the logged in user based on the session ID
     const userData = await User.findByPk(req.session.dbUserData.id, {
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: ["password"] },
     });
-    
-    const user = userData.get({ plain: true });
- 
 
-    // res.render('profile', {
-    //   ...user,
-    //   logged_in: true
-    // });
-    
-    res.json(user)
+    const user = userData.get({ plain: true });
+
+    res.json(user);
   } catch (err) {
     res.status(500).json(err);
   }
-  
 });
 
 // CREATE new user
-router.post('/', async (req, res) => {
-    try {
-      const dbUserData = await User.create({
-        userName: req.body.userName,
-        password: req.body.password,
-        
-      });
-  
-      req.session.save(() => {
-        req.session.loggedIn = true;
-        req.session.user_id = dbUserData.id;
-  
-        res.status(200).json(dbUserData);
-      })
-    } catch (err) {
-      console.log(err);
-      res.status(500).json(err);
+router.post("/", async (req, res) => {
+  try {
+    const dbUserData = await User.create({
+      userName: req.body.userName,
+      password: req.body.password,
+    });
 
-}});
+    req.session.save(() => {
+      req.session.loggedIn = true;
+      req.session.user_id = dbUserData.id;
+
+      res.status(200).json(dbUserData);
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
 
 // Login
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const dbUserData = await User.findOne({
       where: {
@@ -60,7 +51,7 @@ router.post('/login', async (req, res) => {
     if (!dbUserData) {
       res
         .status(400)
-        .json({ message: 'Incorrect username. Please try again!' });
+        .json({ message: "Incorrect username. Please try again!" });
       return;
     }
 
@@ -69,18 +60,18 @@ router.post('/login', async (req, res) => {
     if (!validPassword) {
       res
         .status(400)
-        .json({ message: 'Incorrect password. Please try again!' });
+        .json({ message: "Incorrect password. Please try again!" });
       return;
     }
 
     req.session.save(() => {
       req.session.loggedIn = true;
       //dbUserData is person that just signed in
-      req.session.user_id = dbUserData.id
+      req.session.user_id = dbUserData.id;
 
       res
         .status(200)
-        .json({ user: dbUserData, message: 'You are now logged in!' });
+        .json({ user: dbUserData, message: "You are now logged in!" });
     });
   } catch (err) {
     console.log(err);
@@ -89,8 +80,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Logout
-router.post('/logout', (req, res) => {
- 
+router.post("/logout", (req, res) => {
   if (req.session.loggedIn) {
     req.session.destroy(() => {
       res.status(204).end();
@@ -102,15 +92,15 @@ router.post('/logout', (req, res) => {
 
 //Get User Profile
 //api/users/profile
-router.get('/profile', withAuth, async (req, res) => {
-  console.log('Profile Route Hit')
+router.get("/profile", withAuth, async (req, res) => {
+  console.log("Profile Route Hit");
   try {
     // Find the logged in user based on the session ID
     const userData = await User.findByPk(req.session.user_id, {
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: ["password"] },
     });
-  
-   res.status(200).send(userData)
+
+    res.status(200).send(userData);
   } catch (err) {
     res.status(500).json(err);
   }
