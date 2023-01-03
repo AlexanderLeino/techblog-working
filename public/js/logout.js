@@ -1,15 +1,17 @@
 const logout = async () => {
   try {
+    
     await fetch("/api/users/logout", {
-      method: "POST",
+      method: "GET",
       headers: { "Content-Type": "application/json" },
+      
     });
+    window.location.replace('/dashboard')
   } catch (e) {
     console.log(e);
   }
 };
 
 let logOutBtn = document.getElementById("logout");
-if(logOutBtn){
-  logOutBtn.addEventListener("click", logout);
-} 
+logOutBtn.addEventListener("click", logout);
+
