@@ -1,26 +1,31 @@
 <style>
     
     .blogPostContainer{
-        
         background-color: #2f1515;
         border: solid .25rem #2f1515;
-        height: 2rem;
-
-
+        height: fit-content;
     }
     .title{
         font-weight: bolder;
-
+        padding: 3px;
     }
     .blogPostBody{
         border: solid .25rem #2f1515 ;
         color: black;
+        padding: 3px;
+    }
+    @media(max-width: 428px){
+        .postedBy {
+            text-align: right;
+        }
     }
 </style>
 
 <div class="d-flex blogPostContainer mt-3 justify-content-between">
-        <div class="title">{{title}}</div>
-        <div>Posted by {{user.userName}} on {{dateCreated}}</div>
+        <div class='d-flex justify-content-between w-100'>
+            <div class="title">{{title}}</div>
+            <div class='postedBy'>Posted by {{user.userName}} on {{dateCreated}}</div>
+        </div>
         </div>
         <div class="blogPostBody">
         {{body}}
